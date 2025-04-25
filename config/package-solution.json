@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "power-apps-wp-client-side-solution",
+    "id": "7f70f462-6e1b-42d8-8176-1dfeee05c04c",
+    "version": "1.0.4.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.20.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "PowerAppsWP description"
+      },
+      "longDescription": {
+        "default": "PowerAppsWP description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "power-apps-wp Feature",
+        "description": "The feature that activates elements of the power-apps-wp solution.",
+        "id": "41bed3ea-3a53-4fc8-ae96-1a21d234366a",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/power-apps-wp.sppkg"
+  }
+}
