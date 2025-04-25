@@ -211,12 +211,12 @@ https://site/page.aspx?cmSummaryId=456
 
 This will display when a power apps Embed webpart is added to the page for the first time as a welcome screen
 
-![IntroImage](./src/webparts/PowerAppsWp/assets/IntroImage.png)
+![IntroImage](src/webparts/powerAppsWp/assets/IntoImage.png)
 
 
 ## Configuration Image
 
-![ConfigurationImage](./src/webparts/PowerAppsWp/assets/ConfigurationImage.png)
+![ConfigurationImage](src/webparts/powerAppsWp/assets/ConfigurationImage.png)
 
 > Share your web part with others through Microsoft 365 Patterns and Practices program to get visibility and exposure. More details on the community, open-source projects and other activities from http://aka.ms/m365pnp.
 
