@@ -211,7 +211,7 @@ https://site/page.aspx?cmSummaryId=456
 
 This will display when a power apps Embed webpart is added to the page for the first time as a welcome screen
 
-![IntroImage](src/webparts/powerAppsWp/assets/IntoImage.png)
+![IntroImage](src/webparts/powerAppsWp/assets/IntroImage.png)
 
 
 ## Configuration Image
