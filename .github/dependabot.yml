@@ -1,0 +1,23 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      spfx:
+        patterns:
+          - '@microsoft/sp-*'
+          - '@microsoft/spfx-*'
+          - '@microsoft/eslint-*-spfx'
+    ignore:
+      # React must match the exact version supported by the chosen SPFx release.
+      - dependency-name: react
+      - dependency-name: react-dom
+      - dependency-name: react-test-renderer
+      - dependency-name: '@types/react'
+      - dependency-name: '@types/react-dom'
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

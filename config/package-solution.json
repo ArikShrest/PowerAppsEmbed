@@ -3,7 +3,7 @@
   "solution": {
     "name": "power-apps-wp-client-side-solution",
     "id": "7f70f462-6e1b-42d8-8176-1dfeee05c04c",
-    "version": "1.0.4.0",
+    "version": "1.0.9.0",
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,

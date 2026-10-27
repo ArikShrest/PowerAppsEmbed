@@ -10,5 +10,6 @@ export interface IPowerAppsWpProps {
   height: string;
   paramNames: string;
   openPropertyPane: () => void;
+  isEditMode: boolean;
 
 }

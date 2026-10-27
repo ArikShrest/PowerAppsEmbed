@@ -1,101 +1,53 @@
 import * as React from 'react';
 import styles from './PowerAppsWp.module.scss';
 import type { IPowerAppsWpProps } from './IPowerAppsWpProps';
+import { resolveAppUrl, resolveDimension } from './embedSettings';
+import welcomeImage from '../assets/welcome-light.png';
 
-interface IPowerAppsWpState {
-  powerAppsUrl: string;
+interface IEmbeddedAppProps { url: string; width: string; height: string; }
+
+function EmbeddedApp({ url, width, height }: IEmbeddedAppProps): React.ReactElement {
+  const [loading, setLoading] = React.useState(true);
+  const [delayed, setDelayed] = React.useState(false);
+  React.useEffect(() => {
+    if (!loading) return;
+    const timeout = window.setTimeout(() => setDelayed(true), 20000);
+    return () => window.clearTimeout(timeout);
+  }, [loading]);
+  return (
+    <div className={styles.appContainer}>
+      {loading && <div className={styles.appStatus} role="status" aria-live="polite">
+        {delayed ? 'Taking longer than expected. If the app does not appear, refresh the page or contact the app owner.' : 'Loading app…'}
+      </div>}
+      <iframe title="Power Apps application" src={url}
+        onLoad={() => setLoading(false)}
+        style={{ width: resolveDimension(width, '100%'), height: resolveDimension(height, '70vh') }} />
+    </div>
+  );
 }
 
-export default class PowerAppsWp extends React.Component<IPowerAppsWpProps, IPowerAppsWpState> {
-  constructor(props: IPowerAppsWpProps) {
-    super(props);
-    
-    const resolvedUrl = this.resolveDynamicPlaceholders(this.props.appUrl, this.props.paramNames);
-    this.state = {
-      powerAppsUrl: resolvedUrl
-    };
-  }
-
-  private getParameterByName(name: string, url?: string): string | null {
-    if (!url) url = window.location.href;
-    const params = new URLSearchParams(new URL(url).search);
-    return params.get(name);
-  }
-
-  private resolveDynamicPlaceholders(appUrl: string, paramNames: string): string {
-    if (!appUrl) {
-      console.error('App URL is undefined or null');
-      return ''; // Return an empty string if the appUrl is not provided
-    }
-  
-    // Optional: Skip if no parameters to replace
-    if (!paramNames || paramNames.trim() === '') {
-      return appUrl;
-    }
-  
-    let url = appUrl;
-    const paramList = paramNames.split(',').map(p => p.trim()).filter(p => p.length > 0);
-  
-    paramList.forEach(param => {
-      const value = this.getParameterByName(param);
-      const placeholder = `[${param}]`;
-  
-      // Only replace placeholders that are found in the URL
-      if (url.includes(placeholder)) {
-        url = url.split(placeholder).join(encodeURIComponent(value || ''));
-      }
-    });
-  
-    return url;
-  }
-  
-
+export default class PowerAppsWp extends React.Component<IPowerAppsWpProps> {
   public render(): React.ReactElement<IPowerAppsWpProps> {
+    let appUrl = '';
+    let error = '';
+    try {
+      appUrl = resolveAppUrl(this.props.appUrl, this.props.paramNames, window.location.href);
+    } catch (cause) {
+      error = cause instanceof Error ? cause.message : 'The app URL is invalid.';
+    }
     return (
       <div className={styles.powerAppsWp}>
-        {this.state.powerAppsUrl ? (
-          <iframe 
-            width={this.props.width ? `${this.props.width}px` : '600px'}  
-            height={this.props.height ? `${this.props.height}px` : '400px'}  
-            src={this.state.powerAppsUrl} 
-            style={{ 
-              background: 'none', 
-              backgroundColor: 'transparent', 
-              border: 'none', 
-              display: 'block',
-              width: this.props.width ? `${this.props.width}px` : '600px', 
-              height: this.props.height ? `${this.props.height}px` : '400px' 
-            }} 
-            allowTransparency={true}
-          />
-        ) : (
-          <div style={{ padding: '1em', textAlign: 'center' }}>
-          <img 
-  alt="Welcome illustration" 
-  src={require('../assets/welcome-light.png')} 
-  className={styles.placeholderImage} 
-/>
-          <h2>Custom PowerApps Embed</h2>
-          <p>Include a custom business app on your page.</p>
-          <button 
-  onClick={this.props.openPropertyPane} 
-  style={{
-    padding: '0.6em 1.2em',
-    fontSize: '1em',
-    backgroundColor: '#1c355e',
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    marginTop: '1em'
-  }}
->
-  Add an app
-</button>
-        </div>
+        {appUrl ? <EmbeddedApp key={appUrl} url={appUrl} width={this.props.width} height={this.props.height} /> : (
+          <div className={styles.placeholder}>
+            <img alt="" src={welcomeImage} className={styles.placeholderImage} />
+            <h2>Custom PowerApps Embed</h2>
+            {error ? <p role="alert">{error}</p> : <p>Include a custom business app on your page.</p>}
+            {this.props.isEditMode && <button type="button" onClick={this.props.openPropertyPane}>
+              {error ? 'Configure app' : 'Add an app'}
+            </button>}
+          </div>
         )}
       </div>
     );
   }
-  
 }

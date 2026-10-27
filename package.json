@@ -1,44 +1,61 @@
 {
   "name": "power-apps-wp",
-  "version": "0.0.1",
+  "version": "1.0.9",
   "private": true,
   "engines": {
-    "node": ">=18.17.1 <19.0.0"
+    "node": ">=22.14.0 <23.0.0"
   },
-  "main": "lib/index.js",
   "scripts": {
-    "build": "gulp bundle",
-    "clean": "gulp clean",
-    "test": "gulp test"
+    "start": "heft start --clean",
+    "build": "heft build --clean",
+    "clean": "heft clean",
+    "test": "node tests/embedSettings.cjs && node tests/component.cjs",
+    "lint": "eslint src",
+    "package": "heft build --clean --production && heft package-solution --production",
+    "audit": "npm audit --audit-level=high",
+    "trust-dev-cert": "heft trust-dev-cert"
   },
   "dependencies": {
     "@fluentui/react": "^8.106.4",
-    "@microsoft/sp-component-base": "1.20.0",
-    "@microsoft/sp-core-library": "1.20.0",
-    "@microsoft/sp-lodash-subset": "1.20.0",
-    "@microsoft/sp-office-ui-fabric-core": "1.20.0",
-    "@microsoft/sp-property-pane": "1.20.0",
-    "@microsoft/sp-webpart-base": "1.20.0",
-    "google-finance": "^0.1.12",
+    "@microsoft/sp-component-base": "1.23.2",
+    "@microsoft/sp-core-library": "1.23.2",
+    "@microsoft/sp-lodash-subset": "1.23.2",
+    "@microsoft/sp-office-ui-fabric-core": "1.23.2",
+    "@microsoft/sp-property-pane": "1.23.2",
+    "@microsoft/sp-webpart-base": "1.23.2",
     "react": "17.0.1",
     "react-dom": "17.0.1",
-    "tslib": "2.3.1",
-    "yahoo-finance2": "^2.13.3"
+    "tslib": "2.3.1"
+  },
+  "overrides": {
+    "js-yaml@^3.0.0": "3.15.2",
+    "js-yaml@^4.0.0": "4.3.2",
+    "svgo@^2.0.0": "2.8.4",
+    "browserslist@^4.0.0": "4.29.5",
+    "nanoid@^3.0.0": "3.3.20",
+    "fast-uri@^3.0.0": "3.1.9",
+    "brace-expansion@^1.0.0": "1.1.21",
+    "brace-expansion@^2.0.0": "2.1.7",
+    "@rushstack/heft": "1.2.17",
+    "@types/react": "17.0.45"
   },
   "devDependencies": {
-    "@microsoft/eslint-config-spfx": "1.20.2",
-    "@microsoft/eslint-plugin-spfx": "1.20.2",
-    "@microsoft/rush-stack-compiler-4.7": "0.1.0",
-    "@microsoft/sp-build-web": "1.20.2",
-    "@microsoft/sp-module-interfaces": "1.20.2",
-    "@rushstack/eslint-config": "4.0.1",
+    "@microsoft/eslint-config-spfx": "1.23.2",
+    "@microsoft/eslint-plugin-spfx": "1.23.2",
+    "@microsoft/sp-module-interfaces": "1.23.2",
+    "@microsoft/spfx-web-build-rig": "1.23.2",
+    "@microsoft/spfx-heft-plugins": "1.23.2",
+    "@rushstack/heft": "1.2.17",
     "@types/react": "17.0.45",
     "@types/react-dom": "17.0.17",
     "@types/webpack-env": "~1.15.2",
-    "ajv": "^6.12.5",
-    "eslint": "8.57.0",
-    "eslint-plugin-react-hooks": "4.3.0",
-    "gulp": "4.0.2",
-    "typescript": "4.7.4"
+    "@types/heft-jest": "1.0.2",
+    "@types/jest": "30.0.0",
+    "@typescript-eslint/parser": "8.46.2",
+    "css-loader": "7.1.2",
+    "eslint": "9.37.0",
+    "eslint-plugin-react-hooks": "5.2.0",
+    "typescript": "5.8.3",
+    "react-test-renderer": "17.0.1"
   }
 }
