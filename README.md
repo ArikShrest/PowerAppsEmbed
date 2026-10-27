@@ -1,229 +1,69 @@
-# power-apps-wp
+# Power Apps Embed web part
 
-## Summary
+An SPFx web part for embedding a canvas app in SharePoint Online with query-string deep links.
 
-Short summary on functionality and used technologies.
+## Development
 
-[picture of the solution in action, if possible]
+Use **Node 22.14.0 or newer within Node 22**, SPFx **1.23.2**, and React/React DOM **17.0.1**. React is pinned to the version supported by this SPFx release. The project now uses Heft; the old Gulp runner and isolated Node 18 runtime are no longer needed.
 
-## Used SharePoint Framework Version
-
-![version](https://img.shields.io/badge/version-1.20.0-green.svg)
-
-## Applies to
-
-- [SharePoint Framework](https://aka.ms/spfx)
-- [Microsoft 365 tenant](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/set-up-your-developer-tenant)
-
-> Get your own free development tenant by subscribing to [Microsoft 365 developer program](http://aka.ms/o365devprogram)
-
-## Prerequisites
-
-> Any special pre-requisites?
-
-## Solution
-
-| Solution    | Author(s)                                               |
-| ----------- | ------------------------------------------------------- |
-| folder name | Author details (name, company, twitter alias with link) |
-
-## Version history
-
-| Version | Date             | Comments        |
-| ------- | ---------------- | --------------- |
-| 1.1     | March 10, 2021   | Update comment  |
-| 1.0     | January 29, 2021 | Initial release |
-
-## Disclaimer
-
-**THIS CODE IS PROVIDED _AS IS_ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.**
-
----
-
-## Minimal Path to Awesome
-
-- Clone this repository
-- Ensure that you are at the solution folder
-- in the command-line run:
-  - **npm install**
-  - **gulp serve**
-
-> Include any additional steps as needed.
-
-## documentation
-
-# 🧩 Power Apps SPFx Web Part
-
-A SharePoint Framework (SPFx) web part for embedding Power Apps applications in modern SharePoint Online pages. Supports dynamic query string parameters and full-width layout compatibility.
-
----
-
-## 📦 Features
-
-- Embed Power Apps in modern SharePoint pages
-- Use dynamic parameters in URLs (e.g., `?cmSummaryId=123`)
-- Automatically resolves and replaces placeholders like `[cmSummaryId]`
-- Displays a placeholder message when no app is configured
-- Works in **full-width page sections**
-- Customizable iframe dimensions via Web Part settings
-
----
-
-## 🛠️ Property Pane Configuration
-
-| Property        | Description                                                              |
-|----------------|---------------------------------------------------------------------------|
-| `App URL`       | The Power Apps app URL. Use placeholders like `[cmSummaryId]`.           |
-| `Width`         | Width of the iframe (e.g., `100%`, `800`).                               |
-| `Height`        | Height of the iframe (e.g., `600`).                                      |
-| `Param Names`   | Comma-separated list of parameters to read from the page query string.   |
-
-**Example URL with placeholders:**
-
-https://apps.powerapps.com/play/appId=xxx&cmSummaryId=[cmSummaryId]
-
-
-If the SharePoint page URL is:
-https://site/page.aspx?cmSummaryId=456
-
-The app URL becomes:
-https://apps.powerapps.com/play/appId=xxx&cmSummaryId=456
-
----
-
-## 🧠 Power Apps Setup
-
-To enable parameter-based navigation and dynamic record loading from SharePoint, configure the following properties in your Power App:
-
-
-### 🔹 `OnStart` Property
-
-```powerapps
-// Identify which parameter is passed
-If(
-    Value(Param("cmId")) > 0,
-    Set(varParamId, Value(Param("cmId")));
-    Set(varCurrentTab, varNavigationTabs.varDetails)
-);
-If(
-    Value(Param("cmSummaryId")) > 0,
-    Set(varParamId, Value(Param("cmSummaryId")));
-    Set(varCurrentTab, varNavigationTabs.varIntakeSummary)
-);
-If(
-    Value(Param("cmApprovalId")) > 0,
-    Set(varParamId, Value(Param("cmApprovalId")));
-    Set(varCurrentTab, varNavigationTabs.varOverview)
-);
-
-// If a valid param is found
-If(
-    !IsBlank(varParamId),
-    Set(varSelectedItem, LookUp(cm_ComplaintDB, ID = varParamId));
-    Set(varMenuSelected, 2);
-    Set(varcm_ResearchRecord, LookUp(cm_ComplaintSurvey, cm_Id.Value = Text(varSelectedItem.ID)));
-    Set(varcm_ApprovalTracker, LookUp(cm_ApprovalTracker, cm_Id.Value = Text(varSelectedItem.ID)));
-    Set(varFormMode, "Edit");
-    ViewForm(form_Complaint);
-    EditForm(form_Survey);
-    // Load attachments
-    ClearCollect(
-        colAttachment,
-        Filter(cm_ComplaintLibrary, cm_Id.Value = Text(varSelectedItem.ID))
-    )
-,
-    // No param found, start new
-    NewForm(form_Complaint)
-);
-
-```
-### 🔹 `StartScreen ` Property
-
-```powerapps
-If(
-    Value(Param("cmId")) > 0, HomeScreen,
-    Value(Param("cmSummaryId")) > 0, SummaryScreen,
-    Value(Param("cmApprovalId")) > 0, OverviewScreen,
-    HomeScreen
-)
- ```
-## 🧱 Full Width Supports
-
-``` JSON
-"supportsFullBleed": true,
-
+```powershell
+npm ci --ignore-scripts
+npm test
+npm run build
+npm start
 ```
 
-### Example (PowerAppsWpWebPart.manifest.json):
-``` JSON
-{
-  "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-  "alias": "PowerAppsWpWebPart",
-  "componentType": "WebPart",
-  "version": "1.0.0",
-  "manifestVersion": 2,
-  "supportsFullBleed": true,
-  ...
-}
+`npm start` serves HTTPS on port 4321 and opens the SharePoint development page in `config/serve.json`. Sign into your tenant and approve loading debug scripts if prompted. If the development certificate is not trusted, run `npm run trust-dev-cert` and accept the certificate prompt. Use `npm start -- --nobrowser` to run without launching a browser.
 
-```
-## ✅ Example Use Case
+## Configure the web part
 
-### Scenario  
-You want to embed a complaint record form that loads a specific item by its ID.
+| Setting | Behavior |
+| --- | --- |
+| App URL | HTTPS URL on `apps.powerapps.com`. Put placeholders such as `[cmId]` in query parameter values. |
+| Width | Optional positive pixels or CSS units, such as `800`, `800px`, `100%`, or `40rem`. Defaults to the column width. The app is centered when narrower than the column, and explicit widths are capped at the container width on small screens. |
+| Height | Optional positive pixels or CSS units, such as `600`, `600px`, or `70vh`. Defaults to 70% of the viewport height. |
+| Parameter Names | Optional legacy setting retained for existing pages. Placeholder names are detected automatically; no manual list is required. |
 
----
+Hover over, focus, or tap the information icon beside each field label to see its help text. Validation errors still appear directly below the fields in the settings panel. Existing saved App URL, width, height, and parameter-list properties remain compatible. Existing explicit dimensions are respected.
 
-### 🔧 Web Part Configuration
+Example App URL:
 
-#### ▶️ For One Parameter
-
-| **Property**   | **Value**                                              |
-|----------------|--------------------------------------------------------|
-| App URL        | `https://apps.powerapps.com/play/...?cmId=[cmId]`      |
-| Width          | `800`                                                  |
-| Height         | `600`                                                  |
-| Param Names    | `cmId`                                                 |
-
----
-
-#### ▶️ For Multiple Parameters
-
-| **Property**   | **Value**                                                                                  |
-|----------------|--------------------------------------------------------------------------------------------|
-| App URL        | `https://apps.powerapps.com/play/...?cmId=[cmId]&cmSummaryId=[cmSummaryId]&cmApprovalId=[cmApprovalId]` |
-| Width          | `800`                                                                                      |
-| Height         | `600`                                                                                      |
-| Param Names    | `cmId, cmSummaryId, cmApprovalId`                                                          |
-
----
-
-### 🔗 SharePoint Page URL
-
-```url
-https://site/page.aspx?cmSummaryId=456
-
+```text
+https://apps.powerapps.com/play/e/ENVIRONMENT_ID/a/APP_ID?tenantId=TENANT_ID&cmId=[cmId]&cmSummaryId=[cmSummaryId]&cmResearchId=[cmResearchId]&cmApprovalId=[cmApprovalId]
 ```
 
-# Power Apps Emded Preview
+Example SharePoint page link:
 
-## Welcome Image
+```text
+https://TENANT.sharepoint.com/sites/Branches/SitePages/ComplaintManagement.aspx?cmId=30
+```
 
-This will display when a power apps Embed webpart is added to the page for the first time as a welcome screen
+The iframe receives `cmId=30`. Power Apps uses `Param("cmId")` to choose the screen or record. There is no fixed number of placeholders. Multiple page parameters are forwarded together, missing values become empty strings, and values are safely encoded. Fixed URL values such as tenant ID are preserved. Use only one `?` to start the query string; separate subsequent parameters with `&`.
 
-![IntroImage](src/webparts/powerAppsWp/assets/IntroImage.png)
+Click **How to use this application** in the configuration panel to open the bundled README, including no-parameter, one-parameter, and multiple-parameter examples, recordId mapping, and App.OnStart / App.StartScreen formulas. Download the same README from the guide. Its source is [the user guide](src/webparts/powerAppsWp/help/README.md). Loading feedback appears while the iframe loads; after 20 seconds it suggests refreshing the page or contacting the app owner. Cross-origin browser rules prevent the web part from confirming whether authentication inside Power Apps succeeded. No separate open-in-new-tab CTA is shown.
 
+Embedding does not grant access to the app or its data. Share the app and configure data-source permissions separately. Record IDs from the page URL are user-controlled; authorize access in the data source. Power Apps controls precedence when multiple deep links are supplied.
 
-## Configuration Image
+## Production package
 
-![ConfigurationImage](src/webparts/powerAppsWp/assets/ConfigurationImage.png)
+```powershell
+npm run package
+```
 
-> Share your web part with others through Microsoft 365 Patterns and Practices program to get visibility and exposure. More details on the community, open-source projects and other activities from http://aka.ms/m365pnp.
+The command performs a clean production build and creates `sharepoint/solution/power-apps-wp.sppkg`, solution version **1.0.9.0**. Upload it to your app catalog to replace the existing solution. Test authentication, each deep link, and multiple simultaneous parameters in your tenant before production rollout. Component and solution IDs are preserved.
 
-## References
+## Tests and security checks
 
-- [Getting started with SharePoint Framework](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/set-up-your-developer-tenant)
-- [Building for Microsoft teams](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/build-for-teams-overview)
-- [Use Microsoft Graph in your solution](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/web-parts/get-started/using-microsoft-graph-apis)
-- [Publish SharePoint Framework applications to the Marketplace](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/publish-to-marketplace-overview)
-- [Microsoft 365 Patterns and Practices](https://aka.ms/m365pnp) - Guidance, tooling, samples and open-source controls for your Microsoft 365 development
+- `npm test`: deep-link resolution, more than four placeholders, missing and simultaneous values, special-character encoding, destination validation, sizing, configuration updates, loading timers, CTA removal, and cleanup.
+- `npm run lint`: SPFx ESLint rules.
+- `npm run audit`: npm advisory scan, failing on high or critical findings. Includes development dependencies.
+- `.github/workflows/validate.yml`: Node 22 tests, lint, production packaging, and dependency scanning on pushes, pull requests, manual runs, and weekly schedules.
+- `.github/dependabot.yml`: weekly dependency and GitHub Actions update checks. React updates are held for coordinated SPFx upgrades.
+
+The GitHub workflows run after this project is pushed to a GitHub repository with Actions enabled. No publishing or tenant deployment occurs in CI. Security overrides in `package.json` retain fixes for the previously reported dependency advisories; review them during future SPFx upgrades. A passing targeted dependency check is not a claim that the entire dependency tree has no advisories.
+
+The migration audit on October 27, 2026 reported zero high or critical findings, eight moderate findings, and three low findings. All remaining findings were in development dependencies. The raw results are saved in `audit-review.json`.
+
+## Migration notes
+
+The migration replaces Gulp with the SPFx Heft rig, updates all SPFx packages together, adopts the ESLint flat configuration, and uses the system Node 22 installation. An upgrade analysis and the previous local dependency tree were retained under ignored `.tools/` for reference in this workspace. They are not required for a fresh checkout.

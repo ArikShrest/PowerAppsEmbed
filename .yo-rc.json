@@ -2,12 +2,12 @@
   "@microsoft/generator-sharepoint": {
     "plusBeta": false,
     "isCreatingSolution": true,
-    "nodeVersion": "18.20.7",
+    "nodeVersion": "22.23.4",
     "sdksVersions": {
       "@microsoft/microsoft-graph-client": "3.0.2",
       "@microsoft/teams-js": "2.24.0"
     },
-    "version": "1.20.0",
+    "version": "1.23.2",
     "libraryName": "power-apps-wp",
     "libraryId": "7f70f462-6e1b-42d8-8176-1dfeee05c04c",
     "environment": "spo",
@@ -16,6 +16,7 @@
     "solutionShortDescription": "PowerAppsWP description",
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,
-    "componentType": "webpart"
+    "componentType": "webpart",
+    "useGulp": false
   }
 }

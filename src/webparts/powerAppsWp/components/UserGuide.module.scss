@@ -1,0 +1,25 @@
+.readme {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  padding-bottom: 24px;
+
+  h2, h3, h4 {
+    line-height: 1.3;
+    margin-top: 28px;
+  }
+
+  pre {
+    overflow-x: auto;
+    white-space: pre;
+    padding: 16px;
+    border: 1px solid currentColor;
+    border-radius: 4px;
+    line-height: 1.5;
+    font-size: 13px;
+    overflow-wrap: normal;
+
+    &:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  }
+
+  li { margin-bottom: 8px; }
+}

@@ -3,5 +3,5 @@
   "port": 4321,
   "https": true,
   "initialPage":   
-  "https://applefcu.sharepoint.com/sites/AppleNet-Dev/SitePages/Home1.aspx?loadSPFX=true&debugManifestsFile=https%3A%2F%2Flocalhost%3A4321%2Ftemp%2Fmanifests.js"
+  "https://applefcu.sharepoint.com/sites/AppleNet-Dev/SitePages/Complaint-Management.aspx"
 }

@@ -1,9 +1,8 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { Version } from '@microsoft/sp-core-library';
+import { DisplayMode, Version } from '@microsoft/sp-core-library';
 import {
-  IPropertyPaneConfiguration,
-  PropertyPaneTextField
+  IPropertyPaneConfiguration
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
@@ -11,6 +10,9 @@ import { IReadonlyTheme } from '@microsoft/sp-component-base';
 import * as strings from 'PowerAppsWpWebPartStrings';
 import PowerAppsWp from './components/PowerAppsWp';
 import { IPowerAppsWpProps } from './components/IPowerAppsWpProps';
+import { detectParameterNames, validateAppUrl, validateDimension, validateParameterNames } from './components/embedSettings';
+import { PropertyPaneHelpTextField } from './components/PropertyPaneHelpTextField';
+import { PropertyPaneUserGuide } from './components/PropertyPaneUserGuide';
 
 
 export interface IPowerAppsWpWebPartProps {
@@ -38,6 +40,7 @@ export default class PowerAppsWpWebPart extends BaseClientSideWebPart<IPowerApps
         width: this.properties.width,
         height: this.properties.height,
         paramNames: this.properties.paramNames,
+        isEditMode: this.displayMode === DisplayMode.Edit,
         openPropertyPane: () => this.context.propertyPane.open()
       }
     );
@@ -48,6 +51,8 @@ export default class PowerAppsWpWebPart extends BaseClientSideWebPart<IPowerApps
   protected onInit(): Promise<void> {
     return this._getEnvironmentMessage().then(message => {
       this._environmentMessage = message;
+    }).catch(() => {
+      this._environmentMessage = strings.UnknownEnvironment;
     });
   }
 
@@ -98,34 +103,58 @@ export default class PowerAppsWpWebPart extends BaseClientSideWebPart<IPowerApps
     return Version.parse('1.0');
   }
 
+  protected onPropertyPaneFieldChanged(propertyPath: string, oldValue: unknown, newValue: unknown): void {
+    super.onPropertyPaneFieldChanged(propertyPath, oldValue, newValue);
+    if (propertyPath === 'appUrl') this.context.propertyPane.refresh();
+  }
+
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
+    let detectedNames: string[] = [];
+    try {
+      detectedNames = detectParameterNames(this.properties.appUrl);
+    } catch {
+      // The URL field displays the validation error.
+    }
     return {
       pages: [
         {
           header: {
-            description: strings.PropertyPaneDescription
+            description: 'Display a Power Apps canvas app on this page and pass page URL values to open a specific screen or record.'
           },
           groups: [
+            { groupName: 'Help', groupFields: [PropertyPaneUserGuide()] },
             {
+              groupName: 'App settings',
               groupFields: [
-                PropertyPaneTextField('appUrl', {
+                PropertyPaneHelpTextField('appUrl', {
+                  getValue: () => this.properties.appUrl,
                   label: "App URL",
                   multiline: true,
                   rows: 5,
-                  description: "Use [parameterName] in the URL as a placeholder. Example: https://apps.powerapps.com/play/...?paramName1=[paramName1]&paramName2=[paramName2]" // optional, sets visible height
+                  helpText: 'Paste the app web link from Power Apps (https://apps.powerapps.com/play/...). Keep fixed values such as tenantId. For deep links, add query values such as &recordId=[recordId]; the value will come from this SharePoint page URL.',
+                  validate: validateAppUrl
                 }),
-                PropertyPaneTextField('width', {
-                  label: "Width"
+                PropertyPaneHelpTextField('width', {
+                  getValue: () => this.properties.width,
+                  label: "Width",
+                  helpText: 'Set the app width: 800 means 800 pixels; 80% uses 80% of the SharePoint column. A narrower app is centered automatically and will shrink to fit smaller screens. Leave blank to fill the column.',
+                  validate: validateDimension
                 }),
-                PropertyPaneTextField('height', {
-                  label: "Height"
+                PropertyPaneHelpTextField('height', {
+                  getValue: () => this.properties.height,
+                  label: "Height",
+                  helpText: 'Set the app height: 600 means 600 pixels; 70vh uses 70% of the browser window height. Leave blank to use 70vh. Choose enough height to show your app comfortably.',
+                  validate: validateDimension
                 }),
-                PropertyPaneTextField('paramNames', {
-                  label: "Parameter Names (comma-separated)",
-                  description: "Comma-separated list of query string keys to replace. Example: paramName1, paramName2"
+                PropertyPaneHelpTextField('paramNames', {
+                  getValue: () => this.properties.paramNames,
+                  label: 'Parameter Names (optional)',
+                  helpText: `You can leave this blank: names are detected from [placeholders] in the App URL. Existing comma-separated lists, such as recordId,screenName, are kept for compatibility. Detected names: ${detectedNames.join(', ') || 'none'}.`,
+                  validate: validateParameterNames
                 })
               ]
             }
+
           ]
         }
       ]
